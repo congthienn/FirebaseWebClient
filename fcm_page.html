@@ -55,6 +55,15 @@
             }
         }
     });
+    messaging.onTokenRefresh(function () {
+        messaging.getToken()
+            .then(function (newtoken) {
+                console.log("New Token : "+ newtoken);
+            })
+            .catch(function (reason) {
+                console.log(reason);
+            })
+    })
     IntitalizeFireBaseMessaging();
 </script>
 </body>
