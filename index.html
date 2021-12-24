@@ -25,19 +25,27 @@
     const messaging=firebase.messaging();
 
     function IntitalizeFireBaseMessaging() {
-        messaging
-            .requestPermission()
-            .then(function () {
-                console.log("Notification Permission");
-                return messaging.getToken();
-            })
-            .then(function (token) {
-                console.log("Token : "+token);
-                document.getElementById("token").innerHTML=token;
-            })
-            .catch(function (reason) {
-                console.log(reason);
-            });
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker
+            .register("./firebase-messaging-sw.js")
+            .then(function(registration) {
+                console.log("Registration successful, scope is:", registration.scope);
+                messaging.getToken({vapidKey:'BEwDCSHIkpttAp2eRzxWsqxCce2N4i31zbZV9WM-vhL8AUE_sLe-PYVZCJJmL6NszIJ9eqvDsZjdtFimDyF9QY8', serviceWorkerRegistration : registration })
+                .then((currentToken) => {
+                    if (currentToken) {
+                    console.log('current token for client: ', currentToken);
+
+                    } else {
+                    console.log('No registration token available. Request permission to generate one.');
+                    }
+                }).catch((err) => {
+                    console.log('An error occurred while retrieving token. ', err);
+                });  
+                })
+                .catch(function(err) {
+                console.log("Service worker registration failed, error:"  , err );
+            }); 
+            }
     }
 
     messaging.onMessage(function (payload) {
